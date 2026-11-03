@@ -1,0 +1,247 @@
+OPERATING SYSTEMS PRACTICAL — THEORY NOTES (ASSIGNMENTS 1–8)
+===========================================================
+
+Easy-English revision notes for practical exam.
+
+-----------------------------------------------------------
+ASSIGNMENT 1: BASH ADDRESS BOOK
+-----------------------------------------------------------
+
+Aim:
+To create a simple address book using a Bash shell script.
+
+Working:
+1. The script stores contact details in a file.
+2. A menu lets the user create, view, insert, delete, or modify records.
+3. Each record contains fields such as name, age, grade, marks, gender, department, and hosteller status.
+4. Insert adds a new record to the file.
+5. View reads and displays the stored records.
+6. Delete removes a matching record.
+7. Modify updates the selected contact details.
+
+Important commands/concepts:
+- read: accepts input from the user.
+- echo: displays messages or writes data.
+- grep: searches for matching records.
+- sed: edits or removes matching lines.
+- >>: appends data to a file.
+- >: overwrites a file.
+- IFS: controls how fields are separated while reading a record.
+- A pipe (|) is used as the field separator in the address book.
+
+Viva points:
+- A shell script is a file containing commands executed by the shell.
+- CRUD means Create, Read, Update, and Delete.
+- The address book file provides persistent storage, so records remain after the script ends.
+
+-----------------------------------------------------------
+ASSIGNMENT 2: PROCESS MANAGEMENT — FORK, WAIT, ZOMBIE, ORPHAN
+-----------------------------------------------------------
+
+Aim:
+To demonstrate process creation using fork(), synchronization using wait(), and zombie/orphan process states.
+
+Working:
+1. Accept integers from the user.
+2. Use fork() to create a child process.
+3. The child and parent independently sort their copies of the array using Bubble Sort and display them.
+4. The parent uses wait() to wait for the child process to finish.
+5. For the zombie demonstration, a child terminates while the parent delays calling wait().
+6. The terminated child temporarily becomes a zombie.
+7. The parent calls wait() to collect the child's exit status and remove the zombie.
+8. For the orphan demonstration, the parent terminates before the child. The child continues running and is adopted by another process.
+
+Important functions:
+- fork(): creates a child process.
+- wait(): waits for a child process to finish and collects its status.
+- getpid(): returns the current process ID.
+- getppid(): returns the parent process ID.
+- sleep(): pauses execution for a specified number of seconds.
+- exit(): terminates a process.
+
+Viva points:
+- fork() returns 0 in the child, the child's PID in the parent, and -1 on failure.
+- A zombie is a terminated child whose exit status has not yet been collected.
+- An orphan is a child whose parent has terminated.
+- After fork(), parent and child have separate process address spaces.
+
+-----------------------------------------------------------
+ASSIGNMENT 3: THREAD SYNCHRONIZATION — PRODUCER-CONSUMER
+-----------------------------------------------------------
+
+Aim:
+To demonstrate thread synchronization using counting semaphores and mutual exclusion using a mutex.
+
+Working:
+1. Create a buffer of size 5.
+2. The producer thread generates items and adds them to the buffer.
+3. The consumer thread removes items from the buffer.
+4. The empty semaphore counts empty buffer slots; the full semaphore counts filled slots.
+5. The mutex ensures only one thread accesses the shared buffer at a time.
+6. sem_wait() waits for a resource, and sem_post() releases a resource.
+7. pthread_join() waits for both threads to finish.
+8. Finally, the semaphores and mutex are destroyed.
+
+Important functions:
+- pthread_create(): creates a thread.
+- pthread_join(): waits for a thread to finish.
+- sem_wait(): decrements a semaphore or blocks if unavailable.
+- sem_post(): increments a semaphore.
+- pthread_mutex_lock(): locks the critical section.
+- pthread_mutex_unlock(): unlocks the critical section.
+- sem_init()/sem_destroy(): initialize/destroy a semaphore.
+
+Viva points:
+- Producer generates items; consumer uses/removes items.
+- A critical section accesses shared data.
+- A mutex prevents simultaneous access to shared data.
+- A counting semaphore tracks available resources.
+- In the provided code, the loop condition i <= 10 produces/consumes 11 items (0 through 10).
+- The mutex should be initialized with pthread_mutex_init() before the threads are created.
+
+-----------------------------------------------------------
+ASSIGNMENT 4: DINING PHILOSOPHERS — DEADLOCK-FREE SEMAPHORE SOLUTION
+-----------------------------------------------------------
+
+Aim:
+To implement a deadlock-free solution to the Dining Philosophers Problem using semaphores.
+
+Working:
+1. Create 5 philosopher threads and 5 fork semaphores.
+2. Each philosopher thinks and then tries to eat.
+3. Each fork semaphore is initialized to 1, so only one philosopher can use a fork at a time.
+4. The room semaphore is initialized to N-1 (4), allowing at most 4 philosophers to try to acquire forks at once.
+5. A philosopher waits for the room semaphore and then acquires both adjacent forks.
+6. After eating, the philosopher releases both forks and the room semaphore.
+7. pthread_join() waits for all philosopher threads to finish.
+8. Finally, all semaphores are destroyed.
+
+Important concepts:
+- Deadlock: processes/threads wait indefinitely for resources held by one another.
+- Starvation: a process/thread waits indefinitely because others keep receiving resources.
+- Semaphore: controls access to shared resources.
+- Limiting entry to N-1 philosophers prevents circular waiting and therefore prevents deadlock in this solution.
+- This solution prevents deadlock, but does not guarantee starvation will never occur.
+
+Important functions:
+sem_init(), sem_wait(), sem_post(), sem_destroy(), pthread_create(), pthread_join().
+
+-----------------------------------------------------------
+ASSIGNMENT 5: DEADLOCK AVOIDANCE — BANKER'S ALGORITHM
+-----------------------------------------------------------
+
+Aim:
+To implement Banker's Algorithm and find a safe sequence of processes.
+
+Working:
+1. Input the number of processes and resource types.
+2. Input the Allocation, Max, and Available matrices/vectors.
+3. Calculate the Need matrix:
+   Need = Max - Allocation
+4. Check whether a process's Need is less than or equal to Available resources.
+5. If it can proceed, assume the process completes and releases its allocated resources.
+6. Add the process to the safe sequence and update Available.
+7. Repeat until all processes finish or no unfinished process can proceed.
+8. If all processes finish, the system is in a safe state. Otherwise, no safe sequence is found by the algorithm.
+
+Important terms:
+- Allocation: resources currently assigned to a process.
+- Max: maximum resources a process may request.
+- Need: resources still required by a process.
+- Available: resources currently available.
+- Safe sequence: an order in which all processes can finish safely.
+- Safe state: at least one safe sequence exists.
+- Unsafe state: no safe sequence is found; deadlock may be possible.
+- Banker's Algorithm grants a request only if the resulting state remains safe.
+
+For the sample input in the discussed program, the safe sequence is:
+P1 -> P3 -> P4 -> P0 -> P2
+
+-----------------------------------------------------------
+ASSIGNMENT 6: FIFO NAMED PIPES — FULL-DUPLEX COMMUNICATION
+-----------------------------------------------------------
+
+Aim:
+To demonstrate communication between two independent processes using named pipes (FIFOs).
+
+Working:
+1. Two named pipes, fifo1 and fifo2, are used for communication in both directions.
+2. Process 1 sends sentences through a FIFO until the user enters END.
+3. Process 2 reads the sentences and counts characters, words, and lines.
+4. Process 2 stores the result in output.txt.
+5. Process 2 sends the result back through the other FIFO.
+6. Process 1 receives and displays the result.
+
+Important concepts:
+- FIFO is a named pipe used for inter-process communication (IPC).
+- Two FIFOs can provide communication in both directions.
+- Character, word, and line counts depend on how newline and whitespace characters are handled.
+- END is used as a termination marker in the described program.
+
+-----------------------------------------------------------
+ASSIGNMENT 7: PARENT-CHILD COMMUNICATION USING PIPES
+-----------------------------------------------------------
+
+Aim:
+To demonstrate communication between a parent and child process using pipes and file transfer.
+
+Working:
+1. Create two pipes.
+2. The parent sends a file path to the child through the first pipe.
+3. The child reads the file path and opens the file.
+4. The child reads the file contents and sends them to the parent through the second pipe.
+5. The parent receives and displays the file contents.
+
+Important concepts:
+- pipe(): creates a pipe for IPC.
+- Pipes provide a communication channel between processes.
+- One pipe is used for parent-to-child communication and the other for child-to-parent communication.
+- close(): closes unused pipe ends.
+- read() and write(): receive and send data through pipes.
+
+-----------------------------------------------------------
+ASSIGNMENT 8: DISK SCHEDULING — SSTF, SCAN, C-LOOK
+-----------------------------------------------------------
+
+Aim:
+To implement disk scheduling algorithms and calculate the total head movement.
+
+Algorithms:
+1. SSTF (Shortest Seek Time First):
+   Selects the pending request closest to the current disk head position.
+   It generally reduces seek movement, but requests may starve.
+
+2. SCAN:
+   The disk head moves in one direction servicing requests, then reverses direction.
+   It is also called the elevator algorithm.
+   The discussed code moves toward cylinder 0 first and then services requests in the other direction. It uses a simplified boundary handling, so explain the actual code behavior in the practical.
+
+3. C-LOOK:
+   The head services requests in one direction up to the last request in that direction, then jumps to the farthest request on the other side and continues.
+   It does not travel all the way to the physical disk boundary unless a request is there.
+
+Important terms:
+- Seek time: time required for the disk head to move to a track/cylinder.
+- Head movement: distance traveled by the disk head.
+- Total head movement: sum of the distances between successive head positions.
+- Disk scheduling aims to reduce seek time and improve performance.
+
+-----------------------------------------------------------
+QUICK VIVA REVISION
+-----------------------------------------------------------
+
+- Process: a program in execution.
+- Thread: a unit of execution within a process.
+- IPC: inter-process communication.
+- fork(): creates a process.
+- pthread_create(): creates a thread.
+- wait(): waits for a child process.
+- Semaphore: synchronization mechanism that controls resource access.
+- Mutex: lock that allows one thread at a time into a critical section.
+- Deadlock: indefinite waiting for resources.
+- Starvation: indefinite postponement of a process/thread.
+- Safe sequence: process order that allows all processes to complete.
+- FIFO: named pipe for process communication.
+- Disk scheduling: deciding the order in which disk requests are serviced.
+
+END OF NOTES
